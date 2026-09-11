@@ -17,13 +17,13 @@
     height: 100%;
     overflow: hidden;
     background: #000;
-    cursor: url('c1.png') 2 2, auto;
+    cursor: url('c1-small.png') 2 2, auto;
   }
 
   * { cursor: inherit; }
 
   a, button, .clickable, [role="button"], input, select, textarea {
-    cursor: url('c2.png') 4 2, pointer !important;
+    cursor: url('c2-small.png') 4 2, pointer !important;
   }
 
   video {
@@ -152,7 +152,7 @@
     to   { filter: brightness(1.3); }
   }
 
-  /* ============ MINECRAFT RAIN — 3px × 11px ============ */
+  /* ============ MINECRAFT RAIN ============ */
   .rain-layer {
     position: fixed;
     inset: 0;
@@ -204,7 +204,7 @@
   .clock .date .dot { display: inline-block; width: 4px; height: 4px; background: #55ff55; box-shadow: 1px 1px 0 #1a3a1a; flex-shrink: 0; }
   .clock .phase { position: absolute; top: -14px; right: -14px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; line-height: 1; background: #8b8b8b; border: 4px solid #1a1a1a; border-top-color: #c6c6c6; border-left-color: #c6c6c6; border-right-color: #555; border-bottom-color: #373737; box-shadow: 2px 2px 0 rgba(0,0,0,0.5); text-shadow: 1px 1px 0 rgba(0,0,0,0.6); }
 
-  /* ============ DEBUG PANEL — hidden by default ============ */
+  /* ============ DEBUG PANEL ============ */
   .debug {
     position: fixed; bottom: 24px; left: 24px;
     padding: 14px 16px;
@@ -222,10 +222,7 @@
     opacity: 0;
     pointer-events: none;
   }
-  .debug.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  .debug.visible { opacity: 1; pointer-events: auto; }
   .debug h3 { font-size: 0.6rem; color: #ffff55; margin-bottom: 10px; letter-spacing: 1px; }
   .debug .row { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
   .debug .row label { width: 60px; color: #aaa; font-size: 0.5rem; }
@@ -277,24 +274,19 @@
     pointer-events: none;
     transition: opacity 0.35s ease, transform 0.35s ease;
   }
-
   .admin.show {
     opacity: 1;
     pointer-events: auto;
     transform: translate(-50%, -50%) scale(1);
   }
-
   .admin h2 {
     font-size: 0.85rem;
     color: #cc88ff;
-    text-shadow:
-      2px 2px 0 #4a1a7a,
-      0 0 12px rgba(200, 130, 255, 0.8);
+    text-shadow: 2px 2px 0 #4a1a7a, 0 0 12px rgba(200, 130, 255, 0.8);
     margin-bottom: 6px;
     letter-spacing: 2px;
     text-align: center;
   }
-
   .admin .subtitle {
     font-size: 0.45rem;
     color: #aa88dd;
@@ -303,7 +295,6 @@
     letter-spacing: 1px;
     opacity: 0.8;
   }
-
   .admin .section {
     margin-bottom: 14px;
     padding: 10px 12px;
@@ -311,22 +302,13 @@
     border: 2px solid #4a1a7a;
     border-top-color: #7a3aaa;
   }
-
   .admin .section-title {
     font-size: 0.5rem;
     color: #cc88ff;
     margin-bottom: 8px;
     letter-spacing: 1px;
   }
-
-  .admin .row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 6px;
-    flex-wrap: wrap;
-  }
-
+  .admin .row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
   .admin button {
     font-family: 'Press Start 2P', monospace;
     font-size: 0.48rem;
@@ -343,21 +325,11 @@
     letter-spacing: 1px;
     transition: background 0.15s;
   }
-
-  .admin button:hover {
-    background: #6a3a9a;
-  }
-
-  .admin button.active {
-    background: #aa55dd;
-    border-top-color: #dd99ff;
-    border-left-color: #dd99ff;
-  }
-
+  .admin button:hover { background: #6a3a9a; }
+  .admin button.active { background: #aa55dd; border-top-color: #dd99ff; border-left-color: #dd99ff; }
   .admin .close {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 10px; right: 10px;
     padding: 4px 8px;
     font-size: 0.5rem;
     background: #5a1a1a;
@@ -366,11 +338,7 @@
     border-right-color: #3a0a0a;
     border-bottom-color: #2a0000;
   }
-
-  .admin .close:hover {
-    background: #7a2a2a;
-  }
-
+  .admin .close:hover { background: #7a2a2a; }
   .admin .hint {
     font-size: 0.42rem;
     color: #8866aa;
@@ -426,7 +394,6 @@
   </div>
 </div>
 
-<!-- DEBUG PANEL — hidden by default, only visible via admin toggle -->
 <div class="debug" id="debugPanel">
   <h3>⏱ DEBUG</h3>
   <div class="row">
@@ -454,7 +421,6 @@
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
 <div class="admin" id="adminPanel">
   <button class="close" id="adminClose">✕</button>
   <h2>⚡ ADMIN ACCESS ⚡</h2>
@@ -737,7 +703,6 @@
   let typedBuffer = '';
 
   document.addEventListener('keydown', (e) => {
-    // Ignore typing inside form fields
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key.length !== 1) return;
 
@@ -760,17 +725,14 @@
     if (e.key === 'Escape') adminPanel.classList.remove('show');
   });
 
-  // ---- Debug toggle ----
   document.getElementById('adminDebugToggle').addEventListener('click', (e) => {
     debugPanel.classList.toggle('visible');
     e.target.classList.toggle('active', debugPanel.classList.contains('visible'));
   });
 
-  // ---- Rain ----
   document.getElementById('adminRain').addEventListener('click', forceRainBurst);
   document.getElementById('adminRainStop').addEventListener('click', stopAllRain);
 
-  // ---- Time presets ----
   document.querySelectorAll('[data-admin-time]').forEach(btn => {
     btn.addEventListener('click', () => {
       debugMode = true;
@@ -783,7 +745,6 @@
     });
   });
 
-  // ---- Layer toggles ----
   const toggleState = {
     clouds: true,
     particles: true,
@@ -806,7 +767,6 @@
     });
   });
 
-  // ---- Storm ----
   document.getElementById('adminStorm').addEventListener('click', () => {
     forceRainBurst();
     for (let s = 0; s < 6; s++) {
@@ -819,7 +779,6 @@
     }, 4000);
   });
 
-  // ---- Reset ----
   document.getElementById('adminReset').addEventListener('click', () => {
     forceDay = false;
     forceNight = false;
@@ -840,7 +799,6 @@
     speedBtns.forEach(b => b.classList.remove('active'));
     document.querySelector('[data-speed="1"]').classList.add('active');
 
-    // Hide the debug panel again
     debugPanel.classList.remove('visible');
     document.getElementById('adminDebugToggle').classList.remove('active');
   });
