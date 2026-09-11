@@ -20,7 +20,7 @@
     cursor: url('c1.png') 2 2, auto;
   }
 
-  video, div, span { cursor: inherit; }
+  * { cursor: inherit; }
 
   a, button, .clickable, [role="button"], input, select, textarea {
     cursor: url('c2.png') 4 2, pointer !important;
@@ -33,38 +33,37 @@
     height: 100vh;
     object-fit: cover;
     pointer-events: none;
+    filter: contrast(1.08) saturate(1.1);
   }
 
-  /* ============================================================
-     DRIFTING CLOUDS
-     ============================================================ */
+  /* ============ CLOUDS — night only ============ */
   .clouds {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 2;
-    opacity: 0.55;
-    mix-blend-mode: screen;
+    opacity: 0.22;
+    transition: opacity 2s ease;
   }
+  .clouds.night { opacity: 0; }
 
   .cloud {
     position: absolute;
     background: radial-gradient(ellipse at center,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.6) 40%,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.35) 40%,
       rgba(255, 255, 255, 0) 70%);
     border-radius: 50%;
-    filter: blur(30px);
+    filter: blur(22px);
     will-change: transform;
   }
-
   .cloud::before,
   .cloud::after {
     content: '';
     position: absolute;
     background: inherit;
     border-radius: 50%;
-    filter: blur(30px);
+    filter: blur(22px);
   }
   .cloud::before { width: 70%; height: 70%; top: 15%; left: -30%; }
   .cloud::after  { width: 80%; height: 80%; top: 10%; left: 40%; }
@@ -80,22 +79,23 @@
     to   { transform: translateX(calc(100vw + 600px)); }
   }
 
-  /* ============================================================
-     DUST MOTES
-     ============================================================ */
+  /* ============ NIGHT DUST MOTES ============ */
   .particles {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 3;
     overflow: hidden;
+    opacity: 0.55;
+    transition: opacity 2s ease;
   }
+  .particles.night { opacity: 0; }
 
   .particle {
     position: absolute;
     background: radial-gradient(circle at center,
-      rgba(255, 255, 245, 1) 0%,
-      rgba(255, 250, 220, 0.6) 50%,
+      rgba(255, 255, 245, 0.9) 0%,
+      rgba(255, 250, 220, 0.4) 50%,
       rgba(255, 250, 220, 0) 100%);
     border-radius: 50%;
     animation: float linear infinite, twinkle ease-in-out infinite alternate;
@@ -108,152 +108,108 @@
     90%  { opacity: 0.6; }
     100% { transform: translate(40px, -100vh); opacity: 0; }
   }
-
   @keyframes twinkle {
     from { filter: brightness(0.7); }
     to   { filter: brightness(1.4); }
   }
 
-  /* ============================================================
-     AMBIENT RAIN — always on, just 1–2 drops at a time
-     ============================================================ */
-  .rain-layer {
+  /* ============ DAY POLLEN ============ */
+  .day-particles {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 4;
     overflow: hidden;
+    opacity: 0;
+    transition: opacity 2s ease;
   }
+  .day-particles.day { opacity: 1; }
+
+  .day-particle {
+    position: absolute;
+    border-radius: 50%;
+    image-rendering: pixelated;
+    background: #f0e6c8;
+    box-shadow:
+      0 0 0 1px rgba(120, 90, 30, 0.35),
+      0 0 6px rgba(255, 230, 150, 0.7),
+      0 0 12px rgba(255, 220, 120, 0.4);
+    animation: dayFloat linear infinite, dayTwinkle ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+
+  @keyframes dayFloat {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    8%   { opacity: 0.9; }
+    92%  { opacity: 0.7; }
+    100% { transform: translate(-30px, -100vh); opacity: 0; }
+  }
+  @keyframes dayTwinkle {
+    from { filter: brightness(0.85); }
+    to   { filter: brightness(1.3); }
+  }
+
+  /* ============ MINECRAFT RAIN — 3px × 11px ============ */
+  .rain-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+    transition: opacity 2s ease;
+  }
+  .rain-layer.night { opacity: 0; }
 
   .raindrop {
     position: absolute;
-    top: -40px;
-    width: 2px;
-    background: linear-gradient(to bottom,
-      rgba(180, 220, 255, 0) 0%,
-      rgba(180, 220, 255, 0.5) 40%,
-      rgba(200, 230, 255, 0.75) 100%);
-    border-radius: 1px;
-    animation: fall linear infinite;
+    width: 3px;
+    height: 11px;
+    background: #4a7fbf;
+    image-rendering: pixelated;
     will-change: transform;
   }
 
-  @keyframes fall {
-    from { transform: translateY(0) translateX(0); }
-    to   { transform: translateY(115vh) translateX(-25px); }
+  @keyframes dropFall {
+    from { transform: translateY(0); }
+    to   { transform: translateY(110vh); }
   }
 
-  /* ============================================================
-     MINECRAFT CLOCK
-     ============================================================ */
+  /* ============ CLOCK ============ */
   .clock {
     position: fixed;
-    top: 28px;
-    right: 28px;
+    top: 28px; right: 28px;
     padding: 16px 22px 14px 22px;
-    background: linear-gradient(180deg,
-      rgba(60, 60, 60, 0.85) 0%,
-      rgba(30, 30, 30, 0.9) 100%);
+    background: linear-gradient(180deg, rgba(60,60,60,0.85) 0%, rgba(30,30,30,0.9) 100%);
     border: 4px solid #1a1a1a;
     border-top-color: #6a6a6a;
     border-left-color: #5a5a5a;
     border-right-color: #2a2a2a;
     border-bottom-color: #0a0a0a;
-    box-shadow:
-      4px 4px 0 rgba(0, 0, 0, 0.6),
-      8px 8px 0 rgba(0, 0, 0, 0.35);
-    color: #ffffff;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.6), 8px 8px 0 rgba(0,0,0,0.35);
+    color: #fff;
     text-align: center;
     user-select: none;
     pointer-events: none;
     z-index: 10;
     font-family: 'Press Start 2P', monospace;
   }
+  .clock-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; }
+  .clock .time { font-size: 1.4rem; letter-spacing: 2px; color: #fff; text-shadow: 2px 2px 0 #3f3f3f, 4px 4px 0 rgba(0,0,0,0.6); line-height: 1.4; }
+  .clock .ampm { font-size: 0.6rem; color: #ffff55; text-shadow: 2px 2px 0 #3f3f00, 3px 3px 0 rgba(0,0,0,0.6); margin-top: 2px; }
+  .clock .divider { height: 2px; background: #1a1a1a; border-top: 1px solid #5a5a5a; margin: 8px 0 10px 0; }
+  .clock .date { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.55rem; letter-spacing: 1px; color: #aaa; text-shadow: 2px 2px 0 rgba(0,0,0,0.7); }
+  .clock .date .dot { display: inline-block; width: 4px; height: 4px; background: #55ff55; box-shadow: 1px 1px 0 #1a3a1a; flex-shrink: 0; }
+  .clock .phase { position: absolute; top: -14px; right: -14px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; line-height: 1; background: #8b8b8b; border: 4px solid #1a1a1a; border-top-color: #c6c6c6; border-left-color: #c6c6c6; border-right-color: #555; border-bottom-color: #373737; box-shadow: 2px 2px 0 rgba(0,0,0,0.5); text-shadow: 1px 1px 0 rgba(0,0,0,0.6); }
 
-  .clock-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .clock .time {
-    font-size: 1.4rem;
-    letter-spacing: 2px;
-    color: #ffffff;
-    text-shadow: 2px 2px 0 #3f3f3f, 4px 4px 0 rgba(0, 0, 0, 0.6);
-    line-height: 1.4;
-  }
-
-  .clock .ampm {
-    font-size: 0.6rem;
-    color: #ffff55;
-    text-shadow: 2px 2px 0 #3f3f00, 3px 3px 0 rgba(0, 0, 0, 0.6);
-    margin-top: 2px;
-  }
-
-  .clock .divider {
-    height: 2px;
-    background: #1a1a1a;
-    border-top: 1px solid #5a5a5a;
-    margin: 8px 0 10px 0;
-  }
-
-  .clock .date {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 0.55rem;
-    letter-spacing: 1px;
-    color: #aaaaaa;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
-  }
-
-  .clock .date .dot {
-    display: inline-block;
-    width: 4px;
-    height: 4px;
-    background: #55ff55;
-    box-shadow: 1px 1px 0 #1a3a1a;
-    flex-shrink: 0;
-  }
-
-  .clock .phase {
-    position: absolute;
-    top: -14px;
-    right: -14px;
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    line-height: 1;
-    background: #8b8b8b;
-    border: 4px solid #1a1a1a;
-    border-top-color: #c6c6c6;
-    border-left-color: #c6c6c6;
-    border-right-color: #555;
-    border-bottom-color: #373737;
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
-  }
-
-  /* ============================================================
-     DEBUG TIME PANEL
-     ============================================================ */
+  /* ============ DEBUG PANEL ============ */
   .debug {
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
+    position: fixed; bottom: 24px; left: 24px;
     padding: 14px 16px;
-    background: rgba(20, 20, 20, 0.9);
+    background: rgba(20,20,20,0.9);
     border: 3px solid #1a1a1a;
     border-top-color: #6a6a6a;
     border-left-color: #5a5a5a;
-    color: #ffffff;
+    color: #fff;
     font-family: 'Press Start 2P', monospace;
     font-size: 0.55rem;
     z-index: 20;
@@ -261,51 +217,17 @@
     min-width: 300px;
     transition: opacity 0.2s;
   }
-
-  .debug.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .debug h3 {
-    font-size: 0.6rem;
-    color: #ffff55;
-    margin-bottom: 10px;
-    letter-spacing: 1px;
-  }
-
-  .debug .row {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
-    align-items: center;
-  }
-
-  .debug .row label {
-    width: 60px;
-    color: #aaa;
-    font-size: 0.5rem;
-  }
-
-  .debug input[type="range"] {
-    flex: 1;
-    accent-color: #55ff55;
-    height: 6px;
-  }
-
-  .debug .value {
-    color: #55ff55;
-    min-width: 70px;
-    text-align: right;
-    font-size: 0.55rem;
-  }
-
+  .debug.hidden { opacity: 0; pointer-events: none; }
+  .debug h3 { font-size: 0.6rem; color: #ffff55; margin-bottom: 10px; letter-spacing: 1px; }
+  .debug .row { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
+  .debug .row label { width: 60px; color: #aaa; font-size: 0.5rem; }
+  .debug input[type="range"] { flex: 1; accent-color: #55ff55; height: 6px; }
+  .debug .value { color: #55ff55; min-width: 70px; text-align: right; font-size: 0.55rem; }
   .debug button {
     font-family: 'Press Start 2P', monospace;
     font-size: 0.5rem;
     padding: 6px 8px;
-    background: #6a6a6a;
-    color: #fff;
+    background: #6a6a6a; color: #fff;
     border: 3px solid #1a1a1a;
     border-top-color: #a0a0a0;
     border-left-color: #a0a0a0;
@@ -315,36 +237,17 @@
     text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
     letter-spacing: 1px;
   }
-
   .debug button:hover { background: #7a7a7a; }
-
-  .debug button.active {
-    background: #55aa55;
-    border-top-color: #88dd88;
-    border-left-color: #88dd88;
-  }
-
-  .debug .presets button {
-    flex: 1;
-    padding: 5px 4px;
-    font-size: 0.45rem;
-  }
+  .debug button.active { background: #55aa55; border-top-color: #88dd88; border-left-color: #88dd88; }
+  .debug .presets button { flex: 1; padding: 5px 4px; font-size: 0.45rem; }
 
   @media (max-width: 700px) {
-    .clock {
-      top: 14px; right: 14px;
-      padding: 10px 14px 8px 14px;
-      border-width: 3px;
-      box-shadow: 3px 3px 0 rgba(0,0,0,0.6), 5px 5px 0 rgba(0,0,0,0.3);
-    }
+    .clock { top: 14px; right: 14px; padding: 10px 14px 8px 14px; border-width: 3px; box-shadow: 3px 3px 0 rgba(0,0,0,0.6), 5px 5px 0 rgba(0,0,0,0.3); }
     .clock .time { font-size: 0.9rem; }
     .clock .ampm { font-size: 0.45rem; }
     .clock .date { font-size: 0.42rem; }
-    .clock .phase {
-      width: 28px; height: 28px; font-size: 0.85rem;
-      top: -10px; right: -10px; border-width: 3px;
-    }
-    .cloud { filter: blur(20px); }
+    .clock .phase { width: 28px; height: 28px; font-size: 0.85rem; top: -10px; right: -10px; border-width: 3px; }
+    .cloud { filter: blur(15px); }
     .debug { font-size: 0.5rem; min-width: 250px; padding: 10px; }
   }
 </style>
@@ -355,8 +258,7 @@
   <source src="https://files.catbox.moe/qlhyap.mp4" type="video/mp4">
 </video>
 
-<!-- drifting clouds -->
-<div class="clouds">
+<div class="clouds" id="cloudLayer">
   <div class="cloud c1"></div>
   <div class="cloud c2"></div>
   <div class="cloud c3"></div>
@@ -364,18 +266,17 @@
   <div class="cloud c5"></div>
 </div>
 
-<!-- dust motes -->
 <div class="particles" id="particles"></div>
 
-<!-- ambient rain (always on, 1-2 drops) -->
+<div class="day-particles" id="dayParticles"></div>
+
 <div class="rain-layer" id="rainLayer"></div>
 
-<!-- clock -->
 <div class="clock">
   <div class="phase" id="clockPhase">☀</div>
   <div class="clock-row">
     <span class="time" id="clockTime">--:--</span>
-    <span class="clockAmPm" id="clockAmPm"></span>
+    <span class="ampm" id="clockAmPm"></span>
   </div>
   <div class="divider"></div>
   <div class="date">
@@ -386,23 +287,19 @@
   </div>
 </div>
 
-<!-- debug panel -->
 <div class="debug" id="debugPanel">
   <h3>⏱ DEBUG — press D to hide</h3>
-
   <div class="row">
     <label>TIME</label>
     <input type="range" id="timeSlider" min="0" max="1439" value="720">
     <span class="value" id="timeSliderVal">12:00</span>
   </div>
-
   <div class="row presets">
     <button data-preset="0">12 AM</button>
     <button data-preset="6">6 AM</button>
     <button data-preset="12">12 PM</button>
     <button data-preset="18">6 PM</button>
   </div>
-
   <div class="row">
     <label>SPEED</label>
     <button data-speed="1">1×</button>
@@ -410,7 +307,6 @@
     <button data-speed="600">600×</button>
     <button data-speed="3600">3600×</button>
   </div>
-
   <div class="row">
     <label>REAL</label>
     <span class="value" id="realTimeVal" style="text-align:left; flex:1;">--:--</span>
@@ -419,16 +315,10 @@
 </div>
 
 <script>
-  // ============================================================
-  //  SETTINGS
-  // ============================================================
   const VIDEO_START_HOUR = 6;
   const VIDEO_DURATION   = 104;
+  const REAL_DAY         = 86400;
 
-  // ============================================================
-  //  DAY/NIGHT SYNC
-  // ============================================================
-  const REAL_DAY = 86400;
   const video = document.getElementById('bg');
 
   let debugMode    = false;
@@ -440,18 +330,15 @@
     const now = new Date();
     return now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
   }
-
   function getCurrentMinutes() {
     return debugMode ? debugMinutes : getRealMinutes();
   }
-
   function getVideoPosition(minutes) {
     const secondsToday = minutes * 60;
     const offsetSeconds = VIDEO_START_HOUR * 3600;
     const adjusted = (secondsToday - offsetSeconds + REAL_DAY) % REAL_DAY;
     return (adjusted / REAL_DAY) * VIDEO_DURATION;
   }
-
   function seekVideo() {
     if (!video.duration) return;
     video.currentTime = getVideoPosition(getCurrentMinutes());
@@ -461,101 +348,75 @@
     seekVideo();
     video.pause();
   });
-
   video.addEventListener('canplay', () => {
     video.play().then(() => video.pause()).catch(() => {});
   });
 
-  // ============================================================
-  //  DUST MOTES
-  // ============================================================
+  // ---------- NIGHT DUST MOTES ----------
   const particleContainer = document.getElementById('particles');
-  const PARTICLE_COUNT = 25;
-
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
+  for (let i = 0; i < 15; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-
-    const size = 1 + Math.random() * 2;
+    const size = 1 + Math.random() * 1.5;
     p.style.width  = size + 'px';
     p.style.height = size + 'px';
-
     p.style.left = Math.random() * 100 + 'vw';
     p.style.top  = (40 + Math.random() * 60) + 'vh';
-
     const duration = 25 + Math.random() * 25;
     p.style.animationDuration = `${duration}s, ${3 + Math.random() * 4}s`;
     p.style.animationDelay = `-${Math.random() * duration}s, -${Math.random() * 4}s`;
-
-    p.style.opacity = 0.25 + Math.random() * 0.35;
-
+    p.style.opacity = 0.2 + Math.random() * 0.25;
     particleContainer.appendChild(p);
   }
 
-  // ============================================================
-  //  AMBIENT RAIN — 1 or 2 drops, always falling
-  // ============================================================
+  // ---------- DAY POLLEN ----------
+  const dayParticles = document.getElementById('dayParticles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'day-particle';
+    const size = 2 + Math.random() * 3;
+    p.style.width  = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top  = (40 + Math.random() * 60) + 'vh';
+    const duration = 20 + Math.random() * 20;
+    p.style.animationDuration = `${duration}s, ${2 + Math.random() * 3}s`;
+    p.style.animationDelay = `-${Math.random() * duration}s, -${Math.random() * 3}s`;
+    dayParticles.appendChild(p);
+  }
+
+  // ---------- RAIN: occasional drops, 3×11 px ----------
   const rainLayer = document.getElementById('rainLayer');
+  const FALL_DURATION = 2.2;   // seconds for a drop to cross the screen
 
-  // Random 1 or 2 drops — sparse, always active
-  const RAIN_COUNT = Math.random() < 0.5 ? 1 : 2;
-
-  for (let i = 0; i < RAIN_COUNT; i++) {
+  function spawnDrop() {
     const drop = document.createElement('div');
     drop.className = 'raindrop';
-
-    // Random horizontal position
     drop.style.left = Math.random() * 100 + 'vw';
-
-    // Random vertical length (short, subtle)
-    const h = 12 + Math.random() * 10;
-    drop.style.height = h + 'px';
-
-    // Fall duration — 1.5 to 2.5 seconds per drop
-    const fallDuration = 1.5 + Math.random() * 1.0;
-    drop.style.animationDuration = fallDuration + 's';
-
-    // Random delay so the two drops don't sync
-    drop.style.animationDelay = (-Math.random() * fallDuration) + 's';
-
-    // Subtle opacity — matches the "barely there" vibe
-    drop.style.opacity = 0.35 + Math.random() * 0.25;
-
+    drop.style.animation = `dropFall ${FALL_DURATION}s linear forwards`;
     rainLayer.appendChild(drop);
+
+    // Remove it after it finishes falling
+    setTimeout(() => drop.remove(), FALL_DURATION * 1000 + 100);
   }
 
-  // ============================================================
-  //  MAIN LOOP
-  // ============================================================
-  function tick(now) {
-    const dt = (now - lastTick) / 1000;
-    lastTick = now;
-
-    if (debugMode) {
-      debugMinutes += (dt * timeScale) / 60;
-      if (debugMinutes >= 1440) debugMinutes -= 1440;
-      timeSlider.value = Math.floor(debugMinutes);
-      timeSliderVal.textContent = minutesToClock(debugMinutes);
-    }
-
-    seekVideo();
-    updateClock(getCurrentMinutes());
-
-    requestAnimationFrame(tick);
+  function scheduleNextDrop() {
+    // Random gap between drops (8–20 seconds = rare, natural)
+    const delay = 8000 + Math.random() * 12000;
+    setTimeout(() => {
+      spawnDrop();
+      scheduleNextDrop();
+    }, delay);
   }
+  scheduleNextDrop();
 
-  requestAnimationFrame(tick);
-
-  // ============================================================
-  //  CLOCK
-  // ============================================================
+  // ---------- CLOCK ----------
   const clockTime    = document.getElementById('clockTime');
   const clockAmPm    = document.getElementById('clockAmPm');
   const clockDay     = document.getElementById('clockDay');
   const clockMonth   = document.getElementById('clockMonth');
   const clockDateNum = document.getElementById('clockDateNum');
   const clockPhase   = document.getElementById('clockPhase');
-
   const DAYS   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
@@ -565,29 +426,24 @@
     const ampm = h >= 12 ? 'PM' : 'AM';
     let h12 = h % 12;
     if (h12 === 0) h12 = 12;
-    return String(h12).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+    return String(h12).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' ' + ampm;
   }
-
   function updateClock(minutes) {
     const h = Math.floor(minutes / 60) % 24;
     const m = Math.floor(minutes % 60);
     const ampm = h >= 12 ? 'PM' : 'AM';
     let h12 = h % 12;
     if (h12 === 0) h12 = 12;
-
-    clockTime.textContent = String(h12).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    clockTime.textContent = String(h12).padStart(2,'0') + ':' + String(m).padStart(2,'0');
     clockAmPm.textContent = ampm;
-
     const now = new Date();
     clockDay.textContent     = DAYS[now.getDay()];
     clockMonth.textContent   = MONTHS[now.getMonth()];
-    clockDateNum.textContent = String(now.getDate()).padStart(2, '0');
+    clockDateNum.textContent = String(now.getDate()).padStart(2,'0');
     clockPhase.textContent = (h >= 6 && h < 18) ? '☀' : '☾';
   }
 
-  // ============================================================
-  //  DEBUG PANEL
-  // ============================================================
+  // ---------- DEBUG PANEL ----------
   const debugPanel    = document.getElementById('debugPanel');
   const timeSlider    = document.getElementById('timeSlider');
   const timeSliderVal = document.getElementById('timeSliderVal');
@@ -636,14 +492,42 @@
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'd' || e.key === 'D') {
-      debugPanel.classList.toggle('hidden');
-    }
+    if (e.key === 'd' || e.key === 'D') debugPanel.classList.toggle('hidden');
   });
 
   setInterval(() => {
     realTimeVal.textContent = minutesToClock(getRealMinutes());
   }, 1000);
+
+  // ---------- MAIN LOOP ----------
+  const cloudLayer = document.getElementById('cloudLayer');
+
+  function tick(now) {
+    const dt = (now - lastTick) / 1000;
+    lastTick = now;
+
+    if (debugMode) {
+      debugMinutes += (dt * timeScale) / 60;
+      if (debugMinutes >= 1440) debugMinutes -= 1440;
+      timeSlider.value = Math.floor(debugMinutes);
+      timeSliderVal.textContent = minutesToClock(debugMinutes);
+    }
+
+    seekVideo();
+    updateClock(getCurrentMinutes());
+
+    const hour = getCurrentMinutes() / 60;
+    const isDay = hour >= 8 && hour < 20;
+    const isNight = !isDay;
+
+    rainLayer.classList.toggle('night', !isDay);
+    dayParticles.classList.toggle('day', isDay);
+    cloudLayer.classList.toggle('night', !isNight);
+    particleContainer.classList.toggle('night', !isNight);
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 </script>
 
 </body>
