@@ -79,7 +79,7 @@
     to   { transform: translateX(calc(100vw + 600px)); }
   }
 
-  /* ============ NIGHT DUST MOTES — bigger now ============ */
+  /* ============ NIGHT DUST MOTES ============ */
   .particles {
     position: fixed;
     inset: 0;
@@ -204,7 +204,7 @@
   .clock .date .dot { display: inline-block; width: 4px; height: 4px; background: #55ff55; box-shadow: 1px 1px 0 #1a3a1a; flex-shrink: 0; }
   .clock .phase { position: absolute; top: -14px; right: -14px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; line-height: 1; background: #8b8b8b; border: 4px solid #1a1a1a; border-top-color: #c6c6c6; border-left-color: #c6c6c6; border-right-color: #555; border-bottom-color: #373737; box-shadow: 2px 2px 0 rgba(0,0,0,0.5); text-shadow: 1px 1px 0 rgba(0,0,0,0.6); }
 
-  /* ============ DEBUG PANEL ============ */
+  /* ============ DEBUG PANEL — hidden by default ============ */
   .debug {
     position: fixed; bottom: 24px; left: 24px;
     padding: 14px 16px;
@@ -219,8 +219,13 @@
     box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
     min-width: 300px;
     transition: opacity 0.2s;
+    opacity: 0;
+    pointer-events: none;
   }
-  .debug.hidden { opacity: 0; pointer-events: none; }
+  .debug.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
   .debug h3 { font-size: 0.6rem; color: #ffff55; margin-bottom: 10px; letter-spacing: 1px; }
   .debug .row { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
   .debug .row label { width: 60px; color: #aaa; font-size: 0.5rem; }
@@ -267,7 +272,7 @@
     font-family: 'Press Start 2P', monospace;
     font-size: 0.6rem;
     z-index: 100;
-    min-width: 380px;
+    min-width: 400px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease, transform 0.35s ease;
@@ -374,19 +379,6 @@
     letter-spacing: 1px;
   }
 
-  /* hidden input for keystroke capture */
-  .admin-listener {
-    position: fixed;
-    opacity: 0;
-    pointer-events: none;
-    width: 1px;
-    height: 1px;
-    left: -9999px;
-    top: -9999px;
-    border: none;
-    outline: none;
-  }
-
   @media (max-width: 700px) {
     .clock { top: 14px; right: 14px; padding: 10px 14px 8px 14px; border-width: 3px; box-shadow: 3px 3px 0 rgba(0,0,0,0.6), 5px 5px 0 rgba(0,0,0,0.3); }
     .clock .time { font-size: 0.9rem; }
@@ -434,8 +426,9 @@
   </div>
 </div>
 
+<!-- DEBUG PANEL — hidden by default, only visible via admin toggle -->
 <div class="debug" id="debugPanel">
-  <h3>⏱ DEBUG — press D to hide</h3>
+  <h3>⏱ DEBUG</h3>
   <div class="row">
     <label>TIME</label>
     <input type="range" id="timeSlider" min="0" max="1439" value="720">
@@ -466,6 +459,13 @@
   <button class="close" id="adminClose">✕</button>
   <h2>⚡ ADMIN ACCESS ⚡</h2>
   <div class="subtitle">SYSTEM CONTROL PANEL</div>
+
+  <div class="section">
+    <div class="section-title">🛠 DEVELOPER</div>
+    <div class="row">
+      <button id="adminDebugToggle">TOGGLE DEBUG PANEL</button>
+    </div>
+  </div>
 
   <div class="section">
     <div class="section-title">⚡ RAIN CONTROL</div>
@@ -505,9 +505,6 @@
   <div class="hint">TYPE "admin access" TO TOGGLE</div>
 </div>
 
-<!-- hidden listener input -->
-<input class="admin-listener" id="adminListener" autocomplete="off">
-
 <script>
   const VIDEO_START_HOUR = 6;
   const VIDEO_DURATION   = 104;
@@ -546,12 +543,12 @@
     video.play().then(() => video.pause()).catch(() => {});
   });
 
-  // ---------- NIGHT DUST MOTES — bigger (3–7px) ----------
+  // ---------- NIGHT DUST MOTES ----------
   const particleContainer = document.getElementById('particles');
   for (let i = 0; i < 20; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    const size = 3 + Math.random() * 4;   // 3–7px
+    const size = 3 + Math.random() * 4;
     p.style.width  = size + 'px';
     p.style.height = size + 'px';
     p.style.left = Math.random() * 100 + 'vw';
@@ -602,7 +599,6 @@
   }
   scheduleNextDrop();
 
-  // Admin: force rain / stop rain
   function forceRainBurst() {
     for (let i = 0; i < 40; i++) {
       setTimeout(spawnDrop, i * 80);
@@ -695,10 +691,6 @@
     presetBtns.forEach(b => b.classList.remove('active'));
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'd' || e.key === 'D') debugPanel.classList.toggle('hidden');
-  });
-
   setInterval(() => {
     realTimeVal.textContent = minutesToClock(getRealMinutes());
   }, 1000);
@@ -738,25 +730,18 @@
   requestAnimationFrame(tick);
 
   // ============================================================
-  //  ADMIN ACCESS — type "admin access" (with space)
+  //  ADMIN ACCESS
   // ============================================================
   const adminPanel = document.getElementById('adminPanel');
-  const adminListener = document.getElementById('adminListener');
   const TARGET = 'admin access';
   let typedBuffer = '';
 
-  // Capture keystrokes globally
   document.addEventListener('keydown', (e) => {
-    // Ignore if typing in an input (except our hidden one)
-    if (e.target.tagName === 'INPUT' && e.target !== adminListener) return;
-    if (e.target.tagName === 'TEXTAREA') return;
-
-    // Only care about single character keys
+    // Ignore typing inside form fields
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.key.length !== 1) return;
 
     typedBuffer += e.key.toLowerCase();
-
-    // Keep buffer short
     if (typedBuffer.length > TARGET.length) {
       typedBuffer = typedBuffer.slice(-TARGET.length);
     }
@@ -767,27 +752,25 @@
     }
   });
 
-  // Close button
   document.getElementById('adminClose').addEventListener('click', () => {
     adminPanel.classList.remove('show');
   });
 
-  // Escape closes
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') adminPanel.classList.remove('show');
   });
 
-  // ---- ADMIN ACTIONS ----
-
-  // Rain control
-  document.getElementById('adminRain').addEventListener('click', () => {
-    forceRainBurst();
-  });
-  document.getElementById('adminRainStop').addEventListener('click', () => {
-    stopAllRain();
+  // ---- Debug toggle ----
+  document.getElementById('adminDebugToggle').addEventListener('click', (e) => {
+    debugPanel.classList.toggle('visible');
+    e.target.classList.toggle('active', debugPanel.classList.contains('visible'));
   });
 
-  // Time presets
+  // ---- Rain ----
+  document.getElementById('adminRain').addEventListener('click', forceRainBurst);
+  document.getElementById('adminRainStop').addEventListener('click', stopAllRain);
+
+  // ---- Time presets ----
   document.querySelectorAll('[data-admin-time]').forEach(btn => {
     btn.addEventListener('click', () => {
       debugMode = true;
@@ -800,7 +783,7 @@
     });
   });
 
-  // Layer toggles
+  // ---- Layer toggles ----
   const toggleState = {
     clouds: true,
     particles: true,
@@ -823,14 +806,12 @@
     });
   });
 
-  // Storm mode — lots of rain + darkness
+  // ---- Storm ----
   document.getElementById('adminStorm').addEventListener('click', () => {
     forceRainBurst();
-    // Extra aggressive rain bursts over the next few seconds
     for (let s = 0; s < 6; s++) {
       setTimeout(forceRainBurst, s * 500);
     }
-    // Darken video briefly
     video.style.transition = 'filter 0.5s ease';
     video.style.filter = 'contrast(1.2) saturate(0.8) brightness(0.7)';
     setTimeout(() => {
@@ -838,7 +819,7 @@
     }, 4000);
   });
 
-  // Reset everything
+  // ---- Reset ----
   document.getElementById('adminReset').addEventListener('click', () => {
     forceDay = false;
     forceNight = false;
@@ -848,7 +829,6 @@
     stopAllRain();
     scheduleNextDrop();
 
-    // Reset layer visibility
     toggleState.clouds = true;
     toggleState.particles = true;
     toggleState.dayParticles = true;
@@ -857,9 +837,12 @@
     dayParticles.style.display = '';
     document.querySelectorAll('[data-admin-toggle]').forEach(b => b.classList.remove('active'));
 
-    // Reset speed buttons
     speedBtns.forEach(b => b.classList.remove('active'));
     document.querySelector('[data-speed="1"]').classList.add('active');
+
+    // Hide the debug panel again
+    debugPanel.classList.remove('visible');
+    document.getElementById('adminDebugToggle').classList.remove('active');
   });
 </script>
 
