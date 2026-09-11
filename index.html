@@ -86,7 +86,7 @@
     pointer-events: none;
     z-index: 3;
     overflow: hidden;
-    opacity: 0.55;
+    opacity: 0.9;
     transition: opacity 2s ease;
   }
   .particles.night { opacity: 0; }
@@ -94,23 +94,26 @@
   .particle {
     position: absolute;
     background: radial-gradient(circle at center,
-      rgba(255, 255, 245, 0.9) 0%,
-      rgba(255, 250, 220, 0.4) 50%,
-      rgba(255, 250, 220, 0) 100%);
+      rgba(255, 245, 220, 1) 0%,
+      rgba(255, 235, 180, 0.7) 40%,
+      rgba(255, 235, 180, 0) 100%);
     border-radius: 50%;
+    box-shadow:
+      0 0 8px rgba(255, 230, 150, 0.7),
+      0 0 16px rgba(255, 220, 120, 0.35);
     animation: float linear infinite, twinkle ease-in-out infinite alternate;
     will-change: transform, opacity;
   }
 
   @keyframes float {
     0%   { transform: translate(0, 0); opacity: 0; }
-    10%  { opacity: 0.8; }
-    90%  { opacity: 0.6; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.8; }
     100% { transform: translate(40px, -100vh); opacity: 0; }
   }
   @keyframes twinkle {
-    from { filter: brightness(0.7); }
-    to   { filter: brightness(1.4); }
+    from { filter: brightness(0.8); }
+    to   { filter: brightness(1.5); }
   }
 
   /* ============ DAY POLLEN ============ */
@@ -354,10 +357,10 @@
 
   // ---------- NIGHT DUST MOTES ----------
   const particleContainer = document.getElementById('particles');
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 20; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    const size = 1 + Math.random() * 1.5;
+    const size = 1.5 + Math.random() * 2;
     p.style.width  = size + 'px';
     p.style.height = size + 'px';
     p.style.left = Math.random() * 100 + 'vw';
@@ -365,7 +368,7 @@
     const duration = 25 + Math.random() * 25;
     p.style.animationDuration = `${duration}s, ${3 + Math.random() * 4}s`;
     p.style.animationDelay = `-${Math.random() * duration}s, -${Math.random() * 4}s`;
-    p.style.opacity = 0.2 + Math.random() * 0.25;
+    p.style.opacity = 0.7 + Math.random() * 0.3;
     particleContainer.appendChild(p);
   }
 
@@ -387,7 +390,7 @@
 
   // ---------- RAIN: occasional drops, 3×11 px ----------
   const rainLayer = document.getElementById('rainLayer');
-  const FALL_DURATION = 2.2;   // seconds for a drop to cross the screen
+  const FALL_DURATION = 2.2;
 
   function spawnDrop() {
     const drop = document.createElement('div');
@@ -395,13 +398,10 @@
     drop.style.left = Math.random() * 100 + 'vw';
     drop.style.animation = `dropFall ${FALL_DURATION}s linear forwards`;
     rainLayer.appendChild(drop);
-
-    // Remove it after it finishes falling
     setTimeout(() => drop.remove(), FALL_DURATION * 1000 + 100);
   }
 
   function scheduleNextDrop() {
-    // Random gap between drops (8–20 seconds = rare, natural)
     const delay = 8000 + Math.random() * 12000;
     setTimeout(() => {
       spawnDrop();
