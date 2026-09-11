@@ -66,14 +66,8 @@
     border-radius: 50%;
     filter: blur(30px);
   }
-  .cloud::before {
-    width: 70%; height: 70%;
-    top: 15%; left: -30%;
-  }
-  .cloud::after {
-    width: 80%; height: 80%;
-    top: 10%; left: 40%;
-  }
+  .cloud::before { width: 70%; height: 70%; top: 15%; left: -30%; }
+  .cloud::after  { width: 80%; height: 80%; top: 10%; left: 40%; }
 
   .cloud.c1 { width: 380px; height: 140px; top: 8%;  left: -30%; animation: drift 180s linear infinite; animation-delay: 0s; }
   .cloud.c2 { width: 520px; height: 180px; top: 18%; left: -40%; animation: drift 240s linear infinite; animation-delay: -60s; opacity: 0.7; }
@@ -88,6 +82,7 @@
 
   /* ============================================================
      FLOATING PARTICLES
+     — base styles only; colors are set by JS based on time of day
      ============================================================ */
   .particles {
     position: fixed;
@@ -99,17 +94,15 @@
 
   .particle {
     position: absolute;
-    background: rgba(255, 250, 220, 0.7);
     border-radius: 50%;
-    box-shadow: 0 0 6px rgba(255, 250, 200, 0.5);
     animation: float linear infinite;
-    will-change: transform, opacity;
+    will-change: transform, opacity, background, box-shadow;
   }
 
   @keyframes float {
     0%   { transform: translateY(0) translateX(0); opacity: 0; }
-    10%  { opacity: 0.8; }
-    90%  { opacity: 0.6; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.7; }
     100% { transform: translateY(-100vh) translateX(60px); opacity: 0; }
   }
 
@@ -212,7 +205,7 @@
   }
 
   /* ============================================================
-     DEBUG TIME PANEL — bottom left
+     DEBUG TIME PANEL
      ============================================================ */
   .debug {
     position: fixed;
@@ -353,7 +346,7 @@
   </div>
 </div>
 
-<!-- debug time panel -->
+<!-- debug panel -->
 <div class="debug" id="debugPanel">
   <h3>⏱ DEBUG — press D to hide</h3>
 
@@ -412,6 +405,13 @@
     return debugMode ? debugMinutes : getRealMinutes();
   }
 
+  // 0 at noon, 1 at midnight — drives particle styling
+  function getDarkness() {
+    const h = getCurrentMinutes() / 60;
+    const brightness = (Math.cos((h - 12) * Math.PI / 12) + 1) / 2;
+    return 1 - brightness;
+  }
+
   function getVideoPosition(minutes) {
     const secondsToday = minutes * 60;
     const offsetSeconds = VIDEO_START_HOUR * 3600;
@@ -433,6 +433,67 @@
     video.play().then(() => video.pause()).catch(() => {});
   });
 
+  // ============================================================
+  //  PARTICLES
+  // ============================================================
+  const particleContainer = document.getElementById('particles');
+  const PARTICLE_COUNT = 35;
+  const particles = [];
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+
+    const size = 2 + Math.random() * 4;
+    p.style.width  = size + 'px';
+    p.style.height = size + 'px';
+
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top  = (60 + Math.random() * 40) + 'vh';
+
+    const duration = 18 + Math.random() * 25;
+    p.style.animationDuration = duration + 's';
+    p.style.animationDelay = (-Math.random() * duration) + 's';
+
+    particleContainer.appendChild(p);
+    particles.push(p);
+  }
+
+  // Update particle colors based on current darkness
+  // Day   → darker, brownish, more opaque (visible against bright sky)
+  // Night → bright, glowing, warm (visible against dark sky)
+  function updateParticleStyle() {
+    const d = getDarkness(); // 0 = full day, 1 = full night
+
+    // Interpolate between day and night colors
+    // Day:   warm brown   rgb(120, 80, 40)
+    // Night: bright gold  rgb(255, 220, 130)
+    const r = Math.round(120 + (255 - 120) * d);
+    const g = Math.round(80  + (220 - 80)  * d);
+    const b = Math.round(40  + (130 - 40)  * d);
+
+    // Day needs higher opacity to fight the bright sky
+    const alpha = 0.7 + (1 - d) * 0.25;
+
+    // Glow intensity scales with darkness
+    const glowAlpha = 0.25 + d * 0.55;
+    const glowSize  = 4 + d * 4;
+
+    const bgColor   = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    const glowColor = `rgba(255, ${Math.round(200 + d * 40)}, ${Math.round(120 + d * 60)}, ${glowAlpha})`;
+    const rimColor  = `rgba(30, 20, 10, ${0.6 - d * 0.4})`;
+
+    particles.forEach(p => {
+      p.style.background = bgColor;
+      p.style.boxShadow  =
+        `0 0 ${glowSize}px ${glowColor}, ` +
+        `0 0 2px ${rimColor}`;
+    });
+  }
+
+  // ============================================================
+  //  MAIN LOOP
+  // ============================================================
   function tick(now) {
     const dt = (now - lastTick) / 1000;
     lastTick = now;
@@ -446,6 +507,8 @@
 
     seekVideo();
     updateClock(getCurrentMinutes());
+    updateParticleStyle();
+
     requestAnimationFrame(tick);
   }
 
@@ -549,31 +612,6 @@
   setInterval(() => {
     realTimeVal.textContent = minutesToClock(getRealMinutes());
   }, 1000);
-
-  // ============================================================
-  //  PARTICLES
-  // ============================================================
-  const particleContainer = document.getElementById('particles');
-  const PARTICLE_COUNT = 35;
-
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-
-    const size = 2 + Math.random() * 4;
-    p.style.width  = size + 'px';
-    p.style.height = size + 'px';
-
-    p.style.left = Math.random() * 100 + 'vw';
-    p.style.top  = (60 + Math.random() * 40) + 'vh';
-
-    const duration = 18 + Math.random() * 25;
-    p.style.animationDuration = duration + 's';
-    p.style.animationDelay = (-Math.random() * duration) + 's';
-    p.style.opacity = 0.3 + Math.random() * 0.5;
-
-    particleContainer.appendChild(p);
-  }
 </script>
 
 </body>
