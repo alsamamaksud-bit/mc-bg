@@ -79,7 +79,7 @@
     to   { transform: translateX(calc(100vw + 600px)); }
   }
 
-  /* ============ NIGHT DUST MOTES ============ */
+  /* ============ NIGHT DUST MOTES — bigger now ============ */
   .particles {
     position: fixed;
     inset: 0;
@@ -99,8 +99,8 @@
       rgba(255, 235, 180, 0) 100%);
     border-radius: 50%;
     box-shadow:
-      0 0 8px rgba(255, 230, 150, 0.7),
-      0 0 16px rgba(255, 220, 120, 0.35);
+      0 0 12px rgba(255, 230, 150, 0.8),
+      0 0 24px rgba(255, 220, 120, 0.45);
     animation: float linear infinite, twinkle ease-in-out infinite alternate;
     will-change: transform, opacity;
   }
@@ -244,6 +244,149 @@
   .debug button.active { background: #55aa55; border-top-color: #88dd88; border-left-color: #88dd88; }
   .debug .presets button { flex: 1; padding: 5px 4px; font-size: 0.45rem; }
 
+  /* ============ ADMIN PANEL ============ */
+  .admin {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    padding: 24px 28px;
+    background: linear-gradient(180deg,
+      rgba(30, 20, 40, 0.95) 0%,
+      rgba(15, 10, 25, 0.98) 100%);
+    border: 4px solid #1a1a1a;
+    border-top-color: #aa44ff;
+    border-left-color: #aa44ff;
+    border-right-color: #4a1a7a;
+    border-bottom-color: #2a0a4a;
+    box-shadow:
+      0 0 0 3px #2a1a3a,
+      0 0 60px rgba(170, 68, 255, 0.6),
+      8px 8px 0 rgba(0,0,0,0.7);
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    z-index: 100;
+    min-width: 380px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .admin.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .admin h2 {
+    font-size: 0.85rem;
+    color: #cc88ff;
+    text-shadow:
+      2px 2px 0 #4a1a7a,
+      0 0 12px rgba(200, 130, 255, 0.8);
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+    text-align: center;
+  }
+
+  .admin .subtitle {
+    font-size: 0.45rem;
+    color: #aa88dd;
+    text-align: center;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    opacity: 0.8;
+  }
+
+  .admin .section {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: rgba(60, 30, 90, 0.35);
+    border: 2px solid #4a1a7a;
+    border-top-color: #7a3aaa;
+  }
+
+  .admin .section-title {
+    font-size: 0.5rem;
+    color: #cc88ff;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .admin .row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .admin button {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.48rem;
+    padding: 7px 10px;
+    background: #4a2a6a;
+    color: #fff;
+    border: 3px solid #1a1a1a;
+    border-top-color: #9a5aca;
+    border-left-color: #9a5aca;
+    border-right-color: #2a0a4a;
+    border-bottom-color: #1a003a;
+    cursor: pointer;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.7);
+    letter-spacing: 1px;
+    transition: background 0.15s;
+  }
+
+  .admin button:hover {
+    background: #6a3a9a;
+  }
+
+  .admin button.active {
+    background: #aa55dd;
+    border-top-color: #dd99ff;
+    border-left-color: #dd99ff;
+  }
+
+  .admin .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 8px;
+    font-size: 0.5rem;
+    background: #5a1a1a;
+    border-top-color: #aa4444;
+    border-left-color: #aa4444;
+    border-right-color: #3a0a0a;
+    border-bottom-color: #2a0000;
+  }
+
+  .admin .close:hover {
+    background: #7a2a2a;
+  }
+
+  .admin .hint {
+    font-size: 0.42rem;
+    color: #8866aa;
+    text-align: center;
+    margin-top: 14px;
+    letter-spacing: 1px;
+  }
+
+  /* hidden input for keystroke capture */
+  .admin-listener {
+    position: fixed;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+    left: -9999px;
+    top: -9999px;
+    border: none;
+    outline: none;
+  }
+
   @media (max-width: 700px) {
     .clock { top: 14px; right: 14px; padding: 10px 14px 8px 14px; border-width: 3px; box-shadow: 3px 3px 0 rgba(0,0,0,0.6), 5px 5px 0 rgba(0,0,0,0.3); }
     .clock .time { font-size: 0.9rem; }
@@ -252,6 +395,7 @@
     .clock .phase { width: 28px; height: 28px; font-size: 0.85rem; top: -10px; right: -10px; border-width: 3px; }
     .cloud { filter: blur(15px); }
     .debug { font-size: 0.5rem; min-width: 250px; padding: 10px; }
+    .admin { min-width: 300px; padding: 18px; }
   }
 </style>
 </head>
@@ -317,6 +461,53 @@
   </div>
 </div>
 
+<!-- ADMIN PANEL -->
+<div class="admin" id="adminPanel">
+  <button class="close" id="adminClose">✕</button>
+  <h2>⚡ ADMIN ACCESS ⚡</h2>
+  <div class="subtitle">SYSTEM CONTROL PANEL</div>
+
+  <div class="section">
+    <div class="section-title">⚡ RAIN CONTROL</div>
+    <div class="row">
+      <button id="adminRain">TRIGGER RAIN</button>
+      <button id="adminRainStop">STOP RAIN</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🌍 TIME CONTROL</div>
+    <div class="row">
+      <button data-admin-time="6">DAWN</button>
+      <button data-admin-time="12">NOON</button>
+      <button data-admin-time="18">DUSK</button>
+      <button data-admin-time="0">MIDNIGHT</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🎛 LAYER TOGGLES</div>
+    <div class="row">
+      <button data-admin-toggle="clouds">CLOUDS</button>
+      <button data-admin-toggle="particles">MOTES</button>
+      <button data-admin-toggle="dayParticles">POLLEN</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">💥 CHAOS</div>
+    <div class="row">
+      <button id="adminStorm">⚡ STORM MODE</button>
+      <button id="adminReset">RESET ALL</button>
+    </div>
+  </div>
+
+  <div class="hint">TYPE "admin access" TO TOGGLE</div>
+</div>
+
+<!-- hidden listener input -->
+<input class="admin-listener" id="adminListener" autocomplete="off">
+
 <script>
   const VIDEO_START_HOUR = 6;
   const VIDEO_DURATION   = 104;
@@ -355,12 +546,12 @@
     video.play().then(() => video.pause()).catch(() => {});
   });
 
-  // ---------- NIGHT DUST MOTES ----------
+  // ---------- NIGHT DUST MOTES — bigger (3–7px) ----------
   const particleContainer = document.getElementById('particles');
   for (let i = 0; i < 20; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    const size = 1.5 + Math.random() * 2;
+    const size = 3 + Math.random() * 4;   // 3–7px
     p.style.width  = size + 'px';
     p.style.height = size + 'px';
     p.style.left = Math.random() * 100 + 'vw';
@@ -388,9 +579,10 @@
     dayParticles.appendChild(p);
   }
 
-  // ---------- RAIN: occasional drops, 3×11 px ----------
+  // ---------- RAIN ----------
   const rainLayer = document.getElementById('rainLayer');
   const FALL_DURATION = 2.2;
+  let rainTimeout = null;
 
   function spawnDrop() {
     const drop = document.createElement('div');
@@ -403,12 +595,24 @@
 
   function scheduleNextDrop() {
     const delay = 8000 + Math.random() * 12000;
-    setTimeout(() => {
+    rainTimeout = setTimeout(() => {
       spawnDrop();
       scheduleNextDrop();
     }, delay);
   }
   scheduleNextDrop();
+
+  // Admin: force rain / stop rain
+  function forceRainBurst() {
+    for (let i = 0; i < 40; i++) {
+      setTimeout(spawnDrop, i * 80);
+    }
+  }
+
+  function stopAllRain() {
+    if (rainTimeout) clearTimeout(rainTimeout);
+    rainLayer.innerHTML = '';
+  }
 
   // ---------- CLOCK ----------
   const clockTime    = document.getElementById('clockTime');
@@ -501,6 +705,8 @@
 
   // ---------- MAIN LOOP ----------
   const cloudLayer = document.getElementById('cloudLayer');
+  let forceNight = false;
+  let forceDay = false;
 
   function tick(now) {
     const dt = (now - lastTick) / 1000;
@@ -517,7 +723,9 @@
     updateClock(getCurrentMinutes());
 
     const hour = getCurrentMinutes() / 60;
-    const isDay = hour >= 8 && hour < 20;
+    let isDay = hour >= 8 && hour < 20;
+    if (forceDay) isDay = true;
+    if (forceNight) isDay = false;
     const isNight = !isDay;
 
     rainLayer.classList.toggle('night', !isDay);
@@ -528,6 +736,131 @@
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+
+  // ============================================================
+  //  ADMIN ACCESS — type "admin access" (with space)
+  // ============================================================
+  const adminPanel = document.getElementById('adminPanel');
+  const adminListener = document.getElementById('adminListener');
+  const TARGET = 'admin access';
+  let typedBuffer = '';
+
+  // Capture keystrokes globally
+  document.addEventListener('keydown', (e) => {
+    // Ignore if typing in an input (except our hidden one)
+    if (e.target.tagName === 'INPUT' && e.target !== adminListener) return;
+    if (e.target.tagName === 'TEXTAREA') return;
+
+    // Only care about single character keys
+    if (e.key.length !== 1) return;
+
+    typedBuffer += e.key.toLowerCase();
+
+    // Keep buffer short
+    if (typedBuffer.length > TARGET.length) {
+      typedBuffer = typedBuffer.slice(-TARGET.length);
+    }
+
+    if (typedBuffer === TARGET) {
+      typedBuffer = '';
+      adminPanel.classList.toggle('show');
+    }
+  });
+
+  // Close button
+  document.getElementById('adminClose').addEventListener('click', () => {
+    adminPanel.classList.remove('show');
+  });
+
+  // Escape closes
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') adminPanel.classList.remove('show');
+  });
+
+  // ---- ADMIN ACTIONS ----
+
+  // Rain control
+  document.getElementById('adminRain').addEventListener('click', () => {
+    forceRainBurst();
+  });
+  document.getElementById('adminRainStop').addEventListener('click', () => {
+    stopAllRain();
+  });
+
+  // Time presets
+  document.querySelectorAll('[data-admin-time]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      debugMode = true;
+      const h = parseFloat(btn.dataset.adminTime);
+      debugMinutes = h * 60;
+      timeSlider.value = debugMinutes;
+      timeSliderVal.textContent = minutesToClock(debugMinutes);
+      forceDay = false;
+      forceNight = false;
+    });
+  });
+
+  // Layer toggles
+  const toggleState = {
+    clouds: true,
+    particles: true,
+    dayParticles: true
+  };
+
+  document.querySelectorAll('[data-admin-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.adminToggle;
+      toggleState[key] = !toggleState[key];
+      btn.classList.toggle('active', !toggleState[key]);
+
+      if (key === 'clouds') {
+        cloudLayer.style.display = toggleState.clouds ? '' : 'none';
+      } else if (key === 'particles') {
+        particleContainer.style.display = toggleState.particles ? '' : 'none';
+      } else if (key === 'dayParticles') {
+        dayParticles.style.display = toggleState.dayParticles ? '' : 'none';
+      }
+    });
+  });
+
+  // Storm mode — lots of rain + darkness
+  document.getElementById('adminStorm').addEventListener('click', () => {
+    forceRainBurst();
+    // Extra aggressive rain bursts over the next few seconds
+    for (let s = 0; s < 6; s++) {
+      setTimeout(forceRainBurst, s * 500);
+    }
+    // Darken video briefly
+    video.style.transition = 'filter 0.5s ease';
+    video.style.filter = 'contrast(1.2) saturate(0.8) brightness(0.7)';
+    setTimeout(() => {
+      video.style.filter = 'contrast(1.08) saturate(1.1)';
+    }, 4000);
+  });
+
+  // Reset everything
+  document.getElementById('adminReset').addEventListener('click', () => {
+    forceDay = false;
+    forceNight = false;
+    debugMode = false;
+    timeScale = 1;
+    debugMinutes = null;
+    stopAllRain();
+    scheduleNextDrop();
+
+    // Reset layer visibility
+    toggleState.clouds = true;
+    toggleState.particles = true;
+    toggleState.dayParticles = true;
+    cloudLayer.style.display = '';
+    particleContainer.style.display = '';
+    dayParticles.style.display = '';
+    document.querySelectorAll('[data-admin-toggle]').forEach(b => b.classList.remove('active'));
+
+    // Reset speed buttons
+    speedBtns.forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-speed="1"]').classList.add('active');
+  });
 </script>
 
 </body>
