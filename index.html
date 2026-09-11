@@ -192,9 +192,9 @@
     color: #fff;
     text-align: center;
     user-select: none;
-    pointer-events: none;
     z-index: 10;
     font-family: 'Press Start 2P', monospace;
+    /* clock is now clickable for the admin trigger */
   }
   .clock-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; }
   .clock .time { font-size: 1.4rem; letter-spacing: 2px; color: #fff; text-shadow: 2px 2px 0 #3f3f3f, 4px 4px 0 rgba(0,0,0,0.6); line-height: 1.4; }
@@ -379,7 +379,7 @@
 
 <div class="rain-layer" id="rainLayer"></div>
 
-<div class="clock">
+<div class="clock" id="clockEl">
   <div class="phase" id="clockPhase">☀</div>
   <div class="clock-row">
     <span class="time" id="clockTime">--:--</span>
@@ -468,7 +468,7 @@
     </div>
   </div>
 
-  <div class="hint">TYPE "admin access" TO TOGGLE</div>
+  <div class="hint">SECRET: CLOCK 1× → ANYWHERE 2× → CLOCK 4×</div>
 </div>
 
 <script>
@@ -696,9 +696,12 @@
   requestAnimationFrame(tick);
 
   // ============================================================
-  //  ADMIN ACCESS
+  //  ADMIN PANEL
   // ============================================================
   const adminPanel = document.getElementById('adminPanel');
+  const clockEl = document.getElementById('clockEl');
+
+  // --- Trigger 1: typed "admin access" ---
   const TARGET = 'admin access';
   let typedBuffer = '';
 
@@ -717,6 +720,72 @@
     }
   });
 
+  // --- Trigger 2: click pattern ---
+  // click clock 1× → click anywhere else 2× → click clock 4×
+  const CLICK_TIMEOUT = 1500; // ms between clicks
+  let clickStep = 0;          // 0..6 — where we are in the sequence
+  let clickTimer = null;
+
+  function resetClickSequence() {
+    clickStep = 0;
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+      clickTimer = null;
+    }
+  }
+
+  function armClickTimeout() {
+    if (clickTimer) clearTimeout(clickTimer);
+    clickTimer = setTimeout(resetClickSequence, CLICK_TIMEOUT);
+  }
+
+  document.addEventListener('click', (e) => {
+    // Ignore clicks inside the admin panel itself
+    if (adminPanel.contains(e.target)) return;
+
+    const onClock = clockEl.contains(e.target);
+
+    // Step 0: expecting click on CLOCK (first click)
+    if (clickStep === 0) {
+      if (onClock) {
+        clickStep = 1;
+        armClickTimeout();
+      }
+      return;
+    }
+
+    // Steps 1 & 2: expecting click ANYWHERE ELSE
+    if (clickStep === 1 || clickStep === 2) {
+      if (!onClock) {
+        clickStep++;
+        armClickTimeout();
+      } else {
+        // Clicked clock too early → restart from step 1
+        clickStep = 1;
+        armClickTimeout();
+      }
+      return;
+    }
+
+    // Steps 3, 4, 5, 6: expecting click on CLOCK
+    if (clickStep >= 3 && clickStep <= 6) {
+      if (onClock) {
+        clickStep++;
+        armClickTimeout();
+        if (clickStep === 7) {
+          // Sequence complete!
+          resetClickSequence();
+          adminPanel.classList.toggle('show');
+        }
+      } else {
+        // Wrong click → reset
+        resetClickSequence();
+      }
+      return;
+    }
+  });
+
+  // --- Close & ESC ---
   document.getElementById('adminClose').addEventListener('click', () => {
     adminPanel.classList.remove('show');
   });
@@ -725,6 +794,14 @@
     if (e.key === 'Escape') adminPanel.classList.remove('show');
   });
 
+  // --- URL parameter trigger: ?admin=1 ---
+  if (new URLSearchParams(window.location.search).get('admin') === '1') {
+    adminPanel.classList.add('show');
+  }
+
+  // ============================================================
+  //  ADMIN ACTIONS
+  // ============================================================
   document.getElementById('adminDebugToggle').addEventListener('click', (e) => {
     debugPanel.classList.toggle('visible');
     e.target.classList.toggle('active', debugPanel.classList.contains('visible'));
