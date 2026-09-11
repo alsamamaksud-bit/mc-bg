@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Day/Night Wallpaper</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+
+    /* default cursor (arrow) */
+    cursor: url('c1.png') 2 2, auto;
+  }
+
+  /* children inherit */
+  video, div, span {
+    cursor: inherit;
+  }
+
+  /* pointer cursor (hand) on clickable stuff */
+  a, button, .clickable, [role="button"], input, select, textarea {
+    cursor: url('c2.png') 4 2, pointer !important;
+  }
+
+  video {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     MINECRAFT CLOCK
+     ============================================================ */
+  .clock {
+    position: fixed;
+    top: 28px;
+    right: 28px;
+    padding: 16px 22px 14px 22px;
+    background: linear-gradient(180deg,
+      rgba(60, 60, 60, 0.85) 0%,
+      rgba(30, 30, 30, 0.9) 100%);
+    border: 4px solid #1a1a1a;
+    border-top-color: #6a6a6a;
+    border-left-color: #5a5a5a;
+    border-right-color: #2a2a2a;
+    border-bottom-color: #0a0a0a;
+    box-shadow:
+      4px 4px 0 rgba(0, 0, 0, 0.6),
+      8px 8px 0 rgba(0, 0, 0, 0.35);
+    color: #ffffff;
+    text-align: center;
+    user-select: none;
+    pointer-events: none;
+    z-index: 10;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  .clock-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .clock .time {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-shadow:
+      2px 2px 0 #3f3f3f,
+      4px 4px 0 rgba(0, 0, 0, 0.6);
+    line-height: 1.4;
+  }
+
+  .clock .ampm {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    color: #ffff55;
+    text-shadow:
+      2px 2px 0 #3f3f00,
+      3px 3px 0 rgba(0, 0, 0, 0.6);
+    margin-top: 2px;
+  }
+
+  .clock .divider {
+    height: 2px;
+    background: #1a1a1a;
+    border-top: 1px solid #5a5a5a;
+    margin: 8px 0 10px 0;
+  }
+
+  .clock .date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    color: #aaaaaa;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+  }
+
+  .clock .date .dot {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #55ff55;
+    box-shadow: 1px 1px 0 #1a3a1a;
+    flex-shrink: 0;
+  }
+
+  .clock .phase {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    line-height: 1;
+    background: #8b8b8b;
+    border: 4px solid #1a1a1a;
+    border-top-color: #c6c6c6;
+    border-left-color: #c6c6c6;
+    border-right-color: #555;
+    border-bottom-color: #373737;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+  }
+
+  @media (max-width: 700px) {
+    .clock {
+      top: 14px;
+      right: 14px;
+      padding: 10px 14px 8px 14px;
+      border-width: 3px;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.6), 5px 5px 0 rgba(0,0,0,0.3);
+    }
+    .clock .time { font-size: 0.9rem; letter-spacing: 1px; }
+    .clock .ampm { font-size: 0.45rem; }
+    .clock .date { font-size: 0.42rem; letter-spacing: 0.5px; }
+    .clock .phase {
+      width: 28px;
+      height: 28px;
+      font-size: 0.85rem;
+      top: -10px;
+      right: -10px;
+      border-width: 3px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<video id="bg" muted playsinline preload="auto" crossorigin="anonymous">
+  <source src="https://files.catbox.moe/daynight.mp4" type="video/mp4">
+</video>
+
+<div class="clock">
+  <div class="phase" id="clockPhase">☀</div>
+  <div class="clock-row">
+    <span class="time" id="clockTime">--:--</span>
+    <span class="ampm" id="clockAmPm"></span>
+  </div>
+  <div class="divider"></div>
+  <div class="date">
+    <span id="clockDay">---</span>
+    <span class="dot"></span>
+    <span id="clockMonth">---</span>
+    <span id="clockDateNum">--</span>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  //  SETTINGS
+  // ============================================================
+  const VIDEO_START_HOUR = 6;   // hour of day the video starts at
+  const VIDEO_DURATION   = 104; // seconds (1:44)
+
+  // ============================================================
+  //  DAY/NIGHT VIDEO SYNC
+  // ============================================================
+  const REAL_DAY = 86400;
+  const video = document.getElementById('bg');
+
+  function getVideoPosition() {
+    const now = new Date();
+    const secondsToday =
+      now.getHours() * 3600 +
+      now.getMinutes() * 60 +
+      now.getSeconds();
+
+    const offsetSeconds = VIDEO_START_HOUR * 3600;
+    const adjusted = (secondsToday - offsetSeconds + REAL_DAY) % REAL_DAY;
+    return (adjusted / REAL_DAY) * VIDEO_DURATION;
+  }
+
+  video.addEventListener('loadedmetadata', () => {
+    const dur = video.duration || VIDEO_DURATION;
+
+    // Instantly jump to the correct frame for the user's local time
+    video.currentTime = getVideoPosition();
+    video.pause();
+
+    // Nudge forward once per real second
+    setInterval(() => {
+      let next = video.currentTime + (dur / REAL_DAY);
+      if (next >= dur) next -= dur;
+      video.currentTime = next;
+    }, 1000);
+  });
+
+  // Force the paused frame to render after seeking
+  video.addEventListener('canplay', () => {
+    video.play().then(() => video.pause()).catch(() => {});
+  });
+
+  // ============================================================
+  //  CLOCK
+  // ============================================================
+  const clockTime    = document.getElementById('clockTime');
+  const clockAmPm    = document.getElementById('clockAmPm');
+  const clockDay     = document.getElementById('clockDay');
+  const clockMonth   = document.getElementById('clockMonth');
+  const clockDateNum = document.getElementById('clockDateNum');
+  const clockPhase   = document.getElementById('clockPhase');
+
+  const DAYS   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+  function updateClock() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+
+    let h12 = h % 12;
+    if (h12 === 0) h12 = 12;
+
+    clockTime.textContent = String(h12).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    clockAmPm.textContent = ampm;
+
+    clockDay.textContent     = DAYS[now.getDay()];
+    clockMonth.textContent   = MONTHS[now.getMonth()];
+    clockDateNum.textContent = String(now.getDate()).padStart(2, '0');
+
+    clockPhase.textContent = (h >= 6 && h < 18) ? '☀' : '☾';
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+
+</body>
+</html>
